@@ -64,16 +64,12 @@ A custom deep learning pipeline using TensorFlow/Keras that ingests raw facial i
 - **High Accuracy** — achieved **97.21%** validation accuracy on test data
 
 ## 🏗️ System Architecture
+<img width="2492" height="189" alt="architecture" src="https://github.com/user-attachments/assets/18545565-2df9-413e-96f6-a46876c569ae" />
 
-![Architecture](<img width="2492" height="189" alt="architecture" src="https://github.com/user-attachments/assets/673d7119-d109-4a9a-8b41-0179cfa2e6f8" />
-)
-*(Upload your architecture diagram to `docs/architecture.png` — it will render here automatically)*
 
 ## 🔄 Project Workflow
+<img width="1192" height="2208" alt="workflow" src="https://github.com/user-attachments/assets/2d188e71-7245-4186-b4ef-69213451c7f0" />
 
-![Workflow](![Uploading workflow.png…]()
-)
-*(Upload your workflow diagram to `docs/workflow.png` — it will render here automatically)*
 
 ## 🛠️ Technology Stack
 
