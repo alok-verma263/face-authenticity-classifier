@@ -185,7 +185,7 @@ The final baseline model (`face_authenticity_cnn.keras`) achieved the following 
 
 ## 👥 Contributors
 
-**Alok Verma** — Data Scientist & Machine Learning Engineer ([@alok-verma263](https://github.com/alok-verma263))
+**Alok Verma** — MBA Student (Business Analytics) ([@alok-verma263](https://github.com/alok-verma263))
 
 ## 📚 References
 
