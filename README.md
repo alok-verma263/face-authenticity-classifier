@@ -65,12 +65,14 @@ A custom deep learning pipeline using TensorFlow/Keras that ingests raw facial i
 
 ## 🏗️ System Architecture
 
-![Architecture](docs/architecture.png)
+![Architecture](<img width="2492" height="189" alt="architecture" src="https://github.com/user-attachments/assets/673d7119-d109-4a9a-8b41-0179cfa2e6f8" />
+)
 *(Upload your architecture diagram to `docs/architecture.png` — it will render here automatically)*
 
 ## 🔄 Project Workflow
 
-![Workflow](docs/workflow.png)
+![Workflow](![Uploading workflow.png…]()
+)
 *(Upload your workflow diagram to `docs/workflow.png` — it will render here automatically)*
 
 ## 🛠️ Technology Stack
