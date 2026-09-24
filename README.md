@@ -68,9 +68,8 @@ A custom deep learning pipeline using TensorFlow/Keras that ingests raw facial i
 
 
 ## 🔄 Project Workflow
-<<img width="1192" height="2000" alt="workflow" src="https://github.com/user-attachments/assets/e034c51f-04e4-4eb1-9f94-2098afe36a08" />
- />
-
+<img width="1192" height="2000" alt="workflow" src="https://github.com/user-attachments/assets/e034c51f-04e4-4eb1-9f94-2098afe36a08" />
+ 
 
 ## 🛠️ Technology Stack
 
