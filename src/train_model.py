@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import tensorflow as tf
 from tensorflow.keras import layers, models
+from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint
 
 # Define paths
 script_dir = os.path.dirname(os.path.abspath(__file__))
@@ -82,11 +83,6 @@ model.compile(optimizer='adam',
 
 model.summary()
 
-# Train the model for 5 epochs
-print("\nStarting model training...")
-history = model.fit(train_dataset, validation_data=val_dataset, epochs=5)
-print("Model training completed successfully!")
-
 # Define output directories
 docs_dir = os.path.join(script_dir, "..", "docs")
 reports_fig_dir = os.path.join(script_dir, "..", "reports", "figures")
@@ -94,6 +90,35 @@ models_dir = os.path.join(script_dir, "..", "models")
 os.makedirs(docs_dir, exist_ok=True)
 os.makedirs(reports_fig_dir, exist_ok=True)
 os.makedirs(models_dir, exist_ok=True)
+model_path = os.path.join(models_dir, "face_authenticity_cnn.keras")
+
+# Callbacks: EarlyStopping monitors validation accuracy and automatically restores the best
+# weights from the highest-accuracy epoch, directly preventing mode collapse.
+early_stopping = EarlyStopping(
+    monitor='val_accuracy',
+    mode='max',
+    patience=2,
+    restore_best_weights=True,
+    verbose=1
+)
+
+checkpoint = ModelCheckpoint(
+    filepath=model_path,
+    monitor='val_accuracy',
+    mode='max',
+    save_best_only=True,
+    verbose=1
+)
+
+# Train the model with EarlyStopping and ModelCheckpoint protection
+print("\nStarting model training with EarlyStopping and ModelCheckpoint...")
+history = model.fit(
+    train_dataset,
+    validation_data=val_dataset,
+    epochs=10,
+    callbacks=[early_stopping, checkpoint]
+)
+print("Model training completed successfully!")
 
 # Generate and save training curves
 epochs_range = range(1, len(history.history['accuracy']) + 1)
@@ -126,10 +151,9 @@ plt.savefig(os.path.join(reports_fig_dir, "training_curves.png"), dpi=300)
 plt.close()
 print(f"Training curves saved to: {curves_path}")
 
-# Save the trained model
-model_path = os.path.join(models_dir, "face_authenticity_cnn.keras")
+# Save the final model weights (restored from the optimal epoch)
 model.save(model_path)
-print(f"\nModel successfully saved to: {model_path}")
+print(f"\nBest model (restored from optimal epoch) successfully saved to: {model_path}")
 
 # Evaluate final performance metrics on validation set
 val_loss, val_acc, val_precision, val_recall = model.evaluate(val_dataset)

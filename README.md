@@ -4,7 +4,7 @@
 
 ![Python](https://img.shields.io/badge/Python-3.10-blue?logo=python&logoColor=white)
 ![TensorFlow](https://img.shields.io/badge/TensorFlow-Keras-FF6F00?logo=tensorflow&logoColor=white)
-![Accuracy](https://img.shields.io/badge/Test%20Accuracy-93.96%25-brightgreen)
+![Accuracy](https://img.shields.io/badge/Test%20Accuracy-95.20%25-brightgreen)
 ![Status](https://img.shields.io/badge/status-active-success)
 ![License](https://img.shields.io/badge/license-MIT-lightgrey)
 
@@ -44,9 +44,10 @@ With the rapid advancement of generative AI, the ability to generate hyper-reali
 1. Preprocess and analyze a facial image dataset, validating and filtering down to **5,556 viable images**.
 2. Extract meaningful spatial and visual features from images using TensorFlow's `Conv2D` and `MaxPooling2D` layers.
 3. Train a high-performing binary classification model using dataset-predefined train (3,883), validation (547), and test (1,126) splits.
-4. Evaluate model performance using Accuracy, Precision, Recall, and F1-Score metrics on the hold-out test set.
-5. Analyze the impact of demographic (gender, age groups) and image-quality attributes (detection difficulty, image quality) on classification performance.
-6. Develop an end-user verification system (`predict.py`) that returns authenticity classification and confidence score percentages.
+4. Prevent mode collapse using `EarlyStopping` and `ModelCheckpoint`, automatically preserving peak validation weights.
+5. Evaluate model performance using Accuracy, Precision, Recall, and F1-Score metrics on the hold-out test set.
+6. Analyze the impact of demographic (gender, age groups) and image-quality attributes (detection difficulty, image quality) on classification performance.
+7. Develop an end-user verification system (`predict.py`) that returns authenticity classification and confidence score percentages.
 
 ## 🚨 Problem Statement
 
@@ -59,8 +60,9 @@ A custom deep learning pipeline using TensorFlow/Keras that ingests raw facial i
 ## ✨ Key Features
 
 - **Custom CNN Architecture** — optimized for binary classification of 128×128 RGB facial images
+- **Mode Collapse Prevention** — `EarlyStopping` (`restore_best_weights=True`) & `ModelCheckpoint` monitoring validation accuracy to automatically restore optimal weights
 - **Predefined Data Splits** — strict evaluation on 3,883 training, 547 validation, and 1,126 testing samples
-- **High Test Accuracy** — achieved **93.96%** accuracy and **94.57%** precision on the official holdout test set
+- **High Test Accuracy** — achieved **95.20%** accuracy, **97.30%** precision, and **94.92%** F1-score on the holdout test set
 - **Bias & Demographic Robustness** — multi-attribute evaluation across Gender, Age Groups, Image Quality, and Difficulty tiers
 - **Single-Image Verification CLI** — `predict.py` script evaluating individual images with confidence score percentages
 - **Automated Visual Reporting** — automated generation of training curves and confusion matrix plots
@@ -184,10 +186,10 @@ Example CLI Output:
 ============================================================
 Target Image:      data/raw/images/image_1.jpg
 Authenticity:      REAL (Authentic Face)
-Confidence Score:  93.01%
+Confidence Score:  94.70%
 ------------------------------------------------------------
-Authentic Prob:    93.01%
-Manipulated Prob:  6.99%
+Authentic Prob:    94.70%
+Manipulated Prob:  5.30%
 ============================================================
 Status: [PASS] Image verified as an authentic human face.
 ```
@@ -200,10 +202,10 @@ Evaluation on the official holdout test set (**1,126 images**) demonstrates stro
 
 | Metric | Holdout Test Set (Predefined) | Validation Set |
 |---|---|---|
-| **Accuracy** | **93.96%** | 92.32% |
-| **Precision** | **94.57%** | 94.03% |
-| **Recall** | **92.83%** | 90.65% |
-| **F1-Score** | **93.69%** | 92.31% |
+| **Accuracy** | **95.20%** | 93.24% |
+| **Precision** | **97.30%** | 95.13% |
+| **Recall** | **92.65%** | 91.37% |
+| **F1-Score** | **94.92%** | 93.21% |
 
 ### Demographic & Metadata Robustness Breakdown
 
@@ -212,30 +214,30 @@ The model was subjected to slice-based evaluation across four key metadata dimen
 #### 1. Age Group Demographics
 | Age Group | Sample Count | Accuracy | Precision | Recall | F1-Score |
 |---|---|---|---|---|---|
-| **18–25** | 309 | 93.53% | 94.16% | 91.49% | 92.81% |
+| **18–25** | 309 | 93.85% | 96.21% | 90.07% | 93.04% |
 | **26–35** | 260 | 93.46% | 95.56% | 92.14% | 93.82% |
-| **36–50** | 297 | 94.28% | 93.92% | 94.56% | 94.24% |
-| **50+** | 260 | 94.62% | 94.74% | 93.10% | 93.91% |
+| **36–50** | 297 | 96.97% | 98.59% | 95.24% | 96.89% |
+| **50+** | 260 | 96.54% | 99.08% | 93.10% | 96.00% |
 
 #### 2. Image Quality Levels
 | Quality | Sample Count | Accuracy | Precision | Recall | F1-Score |
 |---|---|---|---|---|---|
-| **High** | 755 | 93.77% | 94.02% | 92.70% | 93.35% |
-| **Medium** | 371 | 94.34% | 95.63% | 93.09% | 94.34% |
+| **High** | 755 | 94.97% | 96.49% | 92.70% | 94.56% |
+| **Medium** | 371 | 95.69% | 98.86% | 92.55% | 95.60% |
 
 #### 3. Detection Difficulty Tiers
 | Difficulty Tier | Sample Count | Accuracy | F1-Score | Note |
 |---|---|---|---|---|
-| **Easy** | 582 | 95.02% | Baseline | Predominantly authentic samples |
-| **Medium** | 180 | 93.89% | 96.85% | Balanced manipulation detection |
-| **Hard** | 364 | 92.31% | 96.00% | High-fidelity synthetic artifacts detected |
+| **Easy** | 582 | 97.59% | Baseline | Predominantly authentic samples |
+| **Medium** | 180 | 94.44% | 97.14% | Balanced manipulation detection |
+| **Hard** | 364 | 91.76% | 95.70% | High-fidelity synthetic artifacts detected |
 
 #### 4. Gender Demographics
 | Gender | Sample Count | Accuracy |
 |---|---|---|
-| **Female** | 217 | 86.64% |
-| **Male** | 205 | 91.22% |
-| **Unknown** | 704 | 97.02% |
+| **Female** | 217 | 88.02% |
+| **Male** | 205 | 93.66% |
+| **Unknown** | 704 | 97.87% |
 
 ## 📊 Visualizations
 
