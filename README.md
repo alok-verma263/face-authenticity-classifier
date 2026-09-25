@@ -4,11 +4,11 @@
 
 ![Python](https://img.shields.io/badge/Python-3.10-blue?logo=python&logoColor=white)
 ![TensorFlow](https://img.shields.io/badge/TensorFlow-Keras-FF6F00?logo=tensorflow&logoColor=white)
-![Accuracy](https://img.shields.io/badge/Validation%20Accuracy-97.21%25-brightgreen)
+![Accuracy](https://img.shields.io/badge/Test%20Accuracy-93.96%25-brightgreen)
 ![Status](https://img.shields.io/badge/status-active-success)
 ![License](https://img.shields.io/badge/license-MIT-lightgrey)
 
-[Overview](#-overview) · [Features](#-key-features) · [Architecture](#️-system-architecture) · [Results](#-results) · [Usage](#️-usage)
+[Overview](#-overview) · [Features](#-key-features) · [Architecture](#️-system-architecture) · [Results](#-results) · [Visualizations](#-visualizations) · [Usage](#️-usage)
 
 ---
 
@@ -27,7 +27,7 @@
 - [Installation](#️-installation)
 - [Usage](#️-usage)
 - [Results](#-results)
-- [Screenshots](#-screenshots)
+- [Visualizations](#-visualizations)
 - [Limitations](#️-limitations)
 - [Future Enhancements](#-future-enhancements)
 - [Contributors](#-contributors)
@@ -37,39 +37,41 @@
 
 ## 📌 Overview
 
-With the rapid advancement of generative AI, the ability to generate hyper-realistic fake images has increased dramatically. This project addresses the growing need for reliable image verification by implementing a custom CNN that classifies facial images as either **REAL** or **FAKE**. The system is evaluated not just on overall accuracy, but also on its robustness across varying demographic metadata and image-quality difficulty tiers.
+With the rapid advancement of generative AI, the ability to generate hyper-realistic fake images has increased dramatically. This project addresses the growing need for reliable image verification by implementing a custom CNN that classifies facial images as either **REAL** or **FAKE**. The system is evaluated not just on overall accuracy, but also on its robustness across predefined splits, varying demographic metadata (Gender, Age Groups), and image-quality difficulty tiers.
 
 ## 🎯 Objectives
 
 1. Preprocess and analyze a facial image dataset, validating and filtering down to **5,556 viable images**.
 2. Extract meaningful spatial and visual features from images using TensorFlow's `Conv2D` and `MaxPooling2D` layers.
-3. Train a high-performing binary classification model to identify image authenticity.
-4. Evaluate model performance using Accuracy, Precision, Recall, and F1-Score metrics.
-5. Analyze the impact of demographic (e.g., gender) and image-quality (e.g., detection difficulty) attributes on classification performance.
-6. Develop a modular, reproducible system capable of supporting future deepfake-detection applications.
+3. Train a high-performing binary classification model using dataset-predefined train (3,883), validation (547), and test (1,126) splits.
+4. Evaluate model performance using Accuracy, Precision, Recall, and F1-Score metrics on the hold-out test set.
+5. Analyze the impact of demographic (gender, age groups) and image-quality attributes (detection difficulty, image quality) on classification performance.
+6. Develop an end-user verification system (`predict.py`) that returns authenticity classification and confidence score percentages.
 
 ## 🚨 Problem Statement
 
-The proliferation of AI-generated media poses significant risks to digital identity, security, and information integrity. Existing verification systems often struggle with sophisticated deepfakes or exhibit undetected biases against certain demographic groups, creating a need for transparent and rigorously evaluated classification models.
+The proliferation of AI-generated media poses significant risks to digital identity, security, and information integrity. Existing verification systems often struggle with sophisticated deepfakes or exhibit undetected biases against certain demographic groups, creating a need for transparent, reproducible, and rigorously evaluated classification models.
 
 ## 💡 Proposed Solution
 
-A custom deep learning pipeline using TensorFlow/Keras that ingests raw facial images, standardizes pixel data, and trains a CNN to detect microscopic deepfake artifacts. The solution includes a dedicated metadata evaluation script to ensure the model maintains consistent performance across varying difficulty tiers and gender demographics.
+A custom deep learning pipeline using TensorFlow/Keras that ingests raw facial images, standardizes pixel data, and trains a CNN to detect microscopic deepfake artifacts. The solution includes a dedicated metadata evaluation script to ensure the model maintains consistent performance across varying difficulty tiers, age categories, and gender demographics, paired with an interactive single-image verification tool.
 
 ## ✨ Key Features
 
 - **Custom CNN Architecture** — optimized for binary classification of 128×128 RGB facial images
-- **Automated Data Pipeline** — scripts for downloading, cleaning, and preprocessing image datasets
-- **Bias & Metadata Analysis** — built-in evaluation to check performance breakdowns by gender and detection difficulty
-- **High Accuracy** — achieved **97.21%** validation accuracy on test data
+- **Predefined Data Splits** — strict evaluation on 3,883 training, 547 validation, and 1,126 testing samples
+- **High Test Accuracy** — achieved **93.96%** accuracy and **94.57%** precision on the official holdout test set
+- **Bias & Demographic Robustness** — multi-attribute evaluation across Gender, Age Groups, Image Quality, and Difficulty tiers
+- **Single-Image Verification CLI** — `predict.py` script evaluating individual images with confidence score percentages
+- **Automated Visual Reporting** — automated generation of training curves and confusion matrix plots
 
 ## 🏗️ System Architecture
+
 <img width="2492" height="189" alt="architecture" src="https://github.com/user-attachments/assets/18545565-2df9-413e-96f6-a46876c569ae" />
 
-
 ## 🔄 Project Workflow
+
 <img width="1192" height="2000" alt="workflow" src="https://github.com/user-attachments/assets/e034c51f-04e4-4eb1-9f94-2098afe36a08" />
- 
 
 ## 🛠️ Technology Stack
 
@@ -78,7 +80,8 @@ A custom deep learning pipeline using TensorFlow/Keras that ingests raw facial i
 | Programming | Python |
 | Deep Learning | TensorFlow, Keras |
 | Data Manipulation | Pandas, NumPy |
-| Machine Learning | Scikit-learn |
+| Machine Learning & Metrics | Scikit-learn |
+| Visualization | Matplotlib, Seaborn |
 | Environment | Conda (`face_env`) |
 | Version Control | Git & GitHub |
 
@@ -87,26 +90,36 @@ A custom deep learning pipeline using TensorFlow/Keras that ingests raw facial i
 ```text
 face-authenticity-classifier/
 ├── data/
-│   ├── processed/         # Cleaned metadata CSVs
-│   └── raw/                # Raw images (ignored in Git)
+│   ├── processed/         # Cleaned metadata CSVs (cleaned_metadata.csv)
+│   └── raw/               # Raw images (5,556 images)
+├── docs/                  # Architectural diagrams and generated evaluation plots
+│   ├── architecture.png
+│   ├── workflow.png
+│   ├── training_curves.png
+│   └── confusion_matrix.png
+├── models/                # Saved trained CNN models (face_authenticity_cnn.keras)
+├── reports/
+│   └── figures/           # Exported publication-ready charts
 ├── src/
 │   ├── download_images.py
 │   ├── preprocess_data.py
 │   ├── train_model.py
-│   └── evaluate_metadata.py
+│   ├── evaluate_metadata.py
+│   └── predict.py
 ├── notebooks/
 │   └── 01_exploratory_data_analysis.ipynb
-├── models/                 # Saved .keras models (ignored in Git)
-├── docs/                   # Images and diagrams
+├── predict.py             # User verification tool (CLI)
 ├── requirements.txt
 └── README.md
 ```
 
 ## 📊 Dataset
 
-The project utilizes a curated dataset of facial images, filtered from 6,557 initial rows down to **5,556 validated images**. The dataset includes accompanying metadata (`cleaned_metadata.csv`) detailing labels (REAL vs. FAKE), gender demographics, and assigned detection difficulty (Easy, Medium, Hard).
+The project utilizes a curated dataset of facial images, filtered from 6,557 initial rows down to **5,556 validated images**. The dataset includes accompanying metadata (`cleaned_metadata.csv`) detailing labels (REAL vs. FAKE), gender demographics, age brackets, image quality indicators, and assigned detection difficulty.
 
-> **Note:** Due to file size constraints, raw images are not hosted in this repository.
+- **Training Split:** 3,883 images (69.9%)
+- **Validation Split:** 547 images (9.8%)
+- **Testing Split:** 1,126 images (20.3%)
 
 ## ⚙️ Installation
 
@@ -140,48 +153,112 @@ Execute the pipeline in the following order using your active environment:
 python src/preprocess_data.py
 ```
 
-**2. Train the model**
+**2. Train the model and generate training curves**
 
 ```bash
 python src/train_model.py
 ```
+*Outputs: `models/face_authenticity_cnn.keras` and `docs/training_curves.png`.*
 
 **3. Run the metadata and bias evaluation**
 
 ```bash
 python src/evaluate_metadata.py
 ```
+*Outputs: Detailed demographic metrics and `docs/confusion_matrix.png`.*
+
+**4. Verify authenticity of single images (User Verification System)**
+
+```bash
+# Evaluate any custom facial image
+python predict.py data/raw/images/image_1.jpg
+
+# Or specify via the image flag
+python predict.py --image path/to/face.jpg
+```
+
+Example CLI Output:
+```text
+============================================================
+    AI FACE AUTHENTICITY VERIFICATION RESULT
+============================================================
+Target Image:      data/raw/images/image_1.jpg
+Authenticity:      REAL (Authentic Face)
+Confidence Score:  93.01%
+------------------------------------------------------------
+Authentic Prob:    93.01%
+Manipulated Prob:  6.99%
+============================================================
+Status: [PASS] Image verified as an authentic human face.
+```
 
 ## 📈 Results
 
-The final baseline model (`face_authenticity_cnn.keras`) achieved the following metrics on the test split:
+### Overall Performance Metrics
 
-| Metric | Score |
-|---|---|
-| Validation Accuracy | **97.21%** |
-| F1-Score | 97.18% |
-| Precision | 97.81% |
-| Recall | 96.57% |
+Evaluation on the official holdout test set (**1,126 images**) demonstrates strong discrimination capability between authentic and synthetic faces:
 
-**Metadata performance highlights:**
+| Metric | Holdout Test Set (Predefined) | Validation Set |
+|---|---|---|
+| **Accuracy** | **93.96%** | 92.32% |
+| **Precision** | **94.57%** | 94.03% |
+| **Recall** | **92.83%** | 90.65% |
+| **F1-Score** | **93.69%** | 92.31% |
 
-- **Gender** — consistent performance across Male (94.95%) and Female (94.20%) samples
-- **Difficulty** — scaled logically, maintaining 95.35% accuracy even on "Hard" detection-difficulty samples, indicating the model learned genuine artifacts rather than superficial cues
+### Demographic & Metadata Robustness Breakdown
 
-## 📸 Screenshots
+The model was subjected to slice-based evaluation across four key metadata dimensions:
 
-*(Add terminal outputs, training curves, or confusion-matrix visualizations here)*
+#### 1. Age Group Demographics
+| Age Group | Sample Count | Accuracy | Precision | Recall | F1-Score |
+|---|---|---|---|---|---|
+| **18–25** | 309 | 93.53% | 94.16% | 91.49% | 92.81% |
+| **26–35** | 260 | 93.46% | 95.56% | 92.14% | 93.82% |
+| **36–50** | 297 | 94.28% | 93.92% | 94.56% | 94.24% |
+| **50+** | 260 | 94.62% | 94.74% | 93.10% | 93.91% |
+
+#### 2. Image Quality Levels
+| Quality | Sample Count | Accuracy | Precision | Recall | F1-Score |
+|---|---|---|---|---|---|
+| **High** | 755 | 93.77% | 94.02% | 92.70% | 93.35% |
+| **Medium** | 371 | 94.34% | 95.63% | 93.09% | 94.34% |
+
+#### 3. Detection Difficulty Tiers
+| Difficulty Tier | Sample Count | Accuracy | F1-Score | Note |
+|---|---|---|---|---|
+| **Easy** | 582 | 95.02% | Baseline | Predominantly authentic samples |
+| **Medium** | 180 | 93.89% | 96.85% | Balanced manipulation detection |
+| **Hard** | 364 | 92.31% | 96.00% | High-fidelity synthetic artifacts detected |
+
+#### 4. Gender Demographics
+| Gender | Sample Count | Accuracy |
+|---|---|---|
+| **Female** | 217 | 86.64% |
+| **Male** | 205 | 91.22% |
+| **Unknown** | 704 | 97.02% |
+
+## 📊 Visualizations
+
+### Training & Validation Curves
+The loss and accuracy progressions across training epochs demonstrate stable convergence without extreme overfitting:
+
+![Training Curves](docs/training_curves.png)
+
+### Confusion Matrix (Test Set)
+Performance breakdown on the 1,126 holdout testing images:
+
+![Confusion Matrix](docs/confusion_matrix.png)
 
 ## ⚠️ Limitations
 
 - High-quality, newer-generation deepfakes (e.g., from updated diffusion models) may evade current feature-extraction layers
-- The model's demographic robustness is currently limited to the labels available in the source dataset
+- Dataset distribution in gender attributes shows uneven proportion of synthetic samples in specific subgroups
 
 ## 🚀 Future Enhancements
 
-- Integrate Vision Transformers (ViT) to compare performance against the baseline CNN
-- Develop a Flask or FastAPI web application for real-time image uploads and inference
-- Expand metadata analysis to include varying lighting conditions and age demographics
+- Integrate Vision Transformers (ViT) to benchmark against CNN spatial features
+- Develop a web interface (Streamlit or FastAPI) for drag-and-drop face verification
+- Implement Grad-CAM visualizations to explain which facial regions trigger manipulated classifications
 
 ## 👥 Contributors
 
