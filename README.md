@@ -226,18 +226,35 @@ The model was subjected to slice-based evaluation across four key metadata dimen
 | **Medium** | 371 | 95.69% | 98.86% | 92.55% | 95.60% |
 
 #### 3. Detection Difficulty Tiers
-| Difficulty Tier | Sample Count | Accuracy | F1-Score | Note |
-|---|---|---|---|---|
-| **Easy** | 582 | 97.59% | Baseline | Predominantly authentic samples |
-| **Medium** | 180 | 94.44% | 97.14% | Balanced manipulation detection |
-| **Hard** | 364 | 91.76% | 95.70% | High-fidelity synthetic artifacts detected |
+| Difficulty Tier | Sample Count | Accuracy | Precision | Recall | F1-Score | Ground Truth Composition |
+|---|---|---|---|---|---|---|
+| **Easy** | 582 | 97.59% | 0.00%* | 0.00%* | 0.00%* | 100% Authentic faces (582 Real, 0 Fake) |
+| **Medium** | 180 | 94.44% | 100.00% | 94.44% | 97.14% | 100% Manipulated faces (0 Real, 180 Fake) |
+| **Hard** | 364 | 91.76% | 100.00% | 91.76% | 95.70% | 100% Manipulated faces (0 Real, 364 Fake) |
+
+> *\*Note on "Easy" Tier Metrics:* In the dataset schema, the "Easy" difficulty tier consists entirely of authentic human faces with 0 synthetic samples. As a result, binary positive metrics (treating FAKE as positive 1) yield zero division for precision and recall, while the model's actual accuracy in verifying authentic human faces in this tier is an outstanding **97.59%**.
 
 #### 4. Gender Demographics
-| Gender | Sample Count | Accuracy |
-|---|---|---|
-| **Female** | 217 | 88.02% |
-| **Male** | 205 | 93.66% |
-| **Unknown** | 704 | 97.87% |
+| Gender | Sample Count | Accuracy | Precision | Recall | F1-Score | Ground Truth Split |
+|---|---|---|---|---|---|---|
+| **Female** | 217 | 88.02% | 11.11% | 5.26% | 7.14% | 198 Real vs 19 Fake (91.2% authentic) |
+| **Male** | 205 | 93.66% | 25.00% | 9.09% | 13.33% | 194 Real vs 11 Fake (94.6% authentic) |
+| **Unknown** | 704 | 97.87% | 99.41% | 97.67% | 98.53% | 190 Real vs 514 Fake (73.0% synthetic) |
+
+> **Analytical Insight on Demographic Labeling:** The dataset shows pronounced labeling asymmetry: human real faces were cataloged with specific gender tags (`Male` or `Female`), whereas 94.5% of synthetic deepfakes were cataloged under the `Unknown` gender tag. Consequently, while overall accuracy across Male (93.66%) and Female (88.02%) is high, positive recall for fake images within those specific subgroups is constrained by the scarcity of synthetic samples labeled with gender tags.
+
+---
+
+### 🛡️ Mode Collapse Mitigation via EarlyStopping
+
+During baseline training, standard CNN pipelines can fall into a **mode collapse** trap: the neural network realizes that blindly predicting "FAKE" for every image can momentarily lower loss, causing FAKE recall to artificially reach 100% while REAL precision drops to 0%, halting actual feature learning.
+
+To protect model integrity:
+- Integrated `EarlyStopping(monitor='val_accuracy', mode='max', patience=2, restore_best_weights=True)`.
+- Paired with `ModelCheckpoint` to persist the peak performing model to `models/face_authenticity_cnn.keras`.
+- **Training Trajectory:** Training automatically stopped at Epoch 5 when validation metrics plateaued, restoring the optimal weights from **Epoch 3** and elevating final test accuracy from 93.96% to **95.20%**.
+
+---
 
 ## 📊 Visualizations
 
@@ -247,9 +264,23 @@ The loss and accuracy progressions across training epochs demonstrate stable con
 ![Training Curves](docs/training_curves.png)
 
 ### Confusion Matrix (Test Set)
-Performance breakdown on the 1,126 holdout testing images:
+Evaluation on all 1,126 holdout testing images demonstrates high discrimination accuracy and low error rates:
 
 ![Confusion Matrix](docs/confusion_matrix.png)
+
+#### Confusion Matrix Breakdown:
+| True Class \ Predicted Class | Predicted REAL (0) | Predicted FAKE (1) | Total | Class Accuracy / Recall |
+|---|---|---|---|---|
+| **Actual REAL (Authentic)** | **568** *(True Negative)* | **14** *(False Positive)* | 582 | **97.59%** |
+| **Actual FAKE (Manipulated)** | **40** *(False Negative)* | **504** *(True Positive)* | 544 | **92.65%** |
+| **Total Predicted** | 608 | 518 | **1,126** | **95.20% Overall Accuracy** |
+
+- **True Authentic Faces Verified (TN):** 568 / 582 (97.59%)
+- **True Manipulated Faces Detected (TP):** 504 / 544 (92.65%)
+- **False Alarm Rate (FP):** Only 2.41% (14 authentic faces misclassified)
+- **High Precision on Manipulated Detections:** 97.30% (504 / 518)
+
+---
 
 ## ⚠️ Limitations
 
@@ -262,9 +293,10 @@ Performance breakdown on the 1,126 holdout testing images:
 - Develop a web interface (Streamlit or FastAPI) for drag-and-drop face verification
 - Implement Grad-CAM visualizations to explain which facial regions trigger manipulated classifications
 
-## 👥 Contributors
+## 👥 Contributors & Acknowledgments
 
-**Alok Verma** — MBA Student (Business Analytics) ([@alok-verma263](https://github.com/alok-verma263))
+- **Alok Verma** — MBA Student (Business Analytics), Amity Business School ([@alok-verma263](https://github.com/alok-verma263))
+- **LaunchED Global Internship** — Capstone Project Submission (Data Analytics Domain)
 
 ## 📚 References
 
